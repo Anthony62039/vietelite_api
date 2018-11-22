@@ -63,13 +63,31 @@ class StudentController extends Controller
     public function show()
     {
         // Take Params
-        $studentId = Input::get('studentId', 'all');
+        $studentId = Input::get('studentId');
         $filter = Input::get('filter');
         $sortOder= Input::get('sortOrder');
         $pageNumber = Input::get('pageNumber');
         $pageSize = Input::get('pageSize');
 
+        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','students.email as student_email','phone','avatar','qr_code','name','phone_1','phone_2','parents.email as parent_email','work','address')->join('parents','parent_id','parents.id');
         //Index
+        //echo $studentId;
+        if($studentId == ''){
+            if($filter == ''){
+                return $students->get();
+            }
+            else{
+                //echo $filter;
+                $filter = str_replace('%', '', $filter);
+                return $students->whereRaw("concat(last_name,'',first_name) like '%".$filter."%'")->orWhere('students.id', 'like', '%'.$filter.'%')->get();
+            }
+            //echo $filter;
+            
+        }
+        else{
+            echo $studentId;
+            return Student::join('parents','parent_id','parents.id')->where('students.id',$studentId)->get();
+        }
         
     }
 
