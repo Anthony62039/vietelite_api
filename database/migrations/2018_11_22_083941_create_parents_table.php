@@ -18,7 +18,7 @@ class CreateParentsTable extends Migration
             $table->string('name', 200);
             $table->string('phone_1', 12);
             $table->string('phone_2', 12)->nullabl();
-            $table->string('email', 200);
+            $table->string('parent_email', 200);
             $table->string('work', 200)->nullable();
             $table->text('address')->nullable();
         });

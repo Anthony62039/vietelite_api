@@ -8,6 +8,6 @@ class Parents extends Model
 {
     //
     public $table = "parents";
-    protected $fillable = ['id','name','phone_1','phone_2','email','work','address'];
+    protected $fillable = ['id','name','phone_1','phone_2','parent_email','work','address'];
     public $timestamps = false;
 }

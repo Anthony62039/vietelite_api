@@ -8,7 +8,10 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
 class StudentController extends Controller
 {
-    //
+    //\
+    public function count(){
+        return Student::count();
+    }
     public function index()
     {
         //
@@ -69,26 +72,31 @@ class StudentController extends Controller
         $pageNumber = Input::get('pageNumber');
         $pageSize = Input::get('pageSize');
 
-        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','students.email as student_email','phone','avatar','qr_code','name','phone_1','phone_2','parents.email as parent_email','work','address')->join('parents','parent_id','parents.id');
+        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','work','address')->join('parents','parent_id','parents.id');
         //Index
         //echo $studentId;
-        if($studentId == ''){
+
+        $result = [];
+
+        if($studentId == '-1'){
             if($filter == ''){
-                return $students->get();
+                $result =  $students->get()->toArray();
             }
             else{
                 //echo $filter;
                 $filter = str_replace('%', '', $filter);
-                return $students->whereRaw("concat(last_name,'',first_name) like '%".$filter."%'")->orWhere('students.id', 'like', '%'.$filter.'%')->get();
+                $result = $students->whereRaw("concat(first_name,' ',last_name) like '%".$filter."%'")->orWhere('students.id', 'like', '%'.$filter.'%')->orWhere('phone_1', 'like', '%'.$filter.'%')->get()->toArray();
             }
             //echo $filter;
             
         }
-        else{
-            echo $studentId;
-            return Student::join('parents','parent_id','parents.id')->where('students.id',$studentId)->get();
+        else{            
+            $result = Student::join('parents','parent_id','parents.id')->where('students.id',$studentId)->get()->toArray();
         }
         
+        $initialPos = $pageNumber * $pageSize;
+        $result = array_slice($result, $initialPos, $initialPos + $pageSize);
+        return $result;
     }
 
     /**

@@ -30,3 +30,5 @@ Route::put('student/{id}','StudentController@update');
 
 // Create new student
 Route::post('student','StudentController@store');
+
+Route::get('student/count', 'StudentController@count');
