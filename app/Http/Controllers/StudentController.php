@@ -68,14 +68,16 @@ class StudentController extends Controller
         // Take Params
         $studentId = Input::get('studentId');
         $filter = Input::get('filter');
-        $sortOder= Input::get('sortOrder');
+        $sortOrder= Input::get('sortOrder');
         $pageNumber = Input::get('pageNumber');
         $pageSize = Input::get('pageSize');
 
         $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','work','address')->join('parents','parent_id','parents.id');
         //Index
         //echo $studentId;
-
+        if($sortOrder == 'desc'){
+            $students->orderBy('student_id', 'DESC');
+        }
         $result = [];
 
         if($studentId == '-1'){
