@@ -6,6 +6,7 @@ use App\Parents;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
+use LaravelQRCode\Facades\QRCode;
 class StudentController extends Controller
 {
     //\
@@ -54,6 +55,15 @@ class StudentController extends Controller
         $parent->save();
 
         $student->parent_id = $parent->id;
+
+        $student->save();
+
+        $file = public_path('qrcode/'.$student->id.".png");
+        QRCode::text($student->id)
+                  ->setSize(8)
+                  ->setMargin(2)->setOutfile($file) 
+                  ->png();
+        $student->qr_code = $file;
         $student->save();
     }
 
