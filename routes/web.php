@@ -32,3 +32,5 @@ Route::put('student/{id}','StudentController@update');
 Route::post('student','StudentController@store');
 
 Route::get('student/count', 'StudentController@count');
+Route::post('enroll', 'EnrollController@store');
+Route::get('import', 'StudentController@import');

@@ -10,6 +10,72 @@ use LaravelQRCode\Facades\QRCode;
 class StudentController extends Controller
 {
     //\
+    function csvToArray($filename = '', $delimiter = '|')
+    {
+        if (!file_exists($filename) || !is_readable($filename))
+            return false;
+
+        $header = null;
+        $data = array();
+        if (($handle = fopen($filename, 'r')) !== false)
+        {
+            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false)
+            {
+                if (!$header)
+                    $header = $row;
+                else
+                    $data[] = array_combine($header, $row);
+            }
+            fclose($handle);
+        }
+
+        return $data;
+    }
+    public function import(){
+        $file = public_path('student.csv');
+
+        $customerArr = $this->csvToArray($file);
+
+        // echo "<pre>";
+        // print_r();
+        for ($i = 0; $i < count($customerArr); $i ++)
+        {
+            //print_r($customerArr[$i]['dob']);
+            $customerArr[$i]['dob'] = str_replace('/', '-', $customerArr[$i]['dob']);
+            // print_r(date('Y-m-d', strtotime($customerArr[$i]['dob'])));
+            // echo "<br>";
+            $student = new Student();
+            $parent = new Parents();
+            $student->id = $customerArr[$i]['id'];
+            $student->last_name = $customerArr[$i]['last_name'];
+            $student->first_name = $customerArr[$i]['first_name'];
+            $student->phone = $customerArr[$i]['phone']; 
+            $student->email = $customerArr[$i]['email']; 
+            $student->dob = date('Y-m-d', strtotime($customerArr[$i]['dob']));
+
+            $parent->name = $customerArr[$i]['parent_name'];
+            $parent->phone_1 = $customerArr[$i]['phone_1'];
+            $parent->phone_2 = $customerArr[$i]['phone_2'];
+            $parent->parent_email =  $customerArr[$i]['email_1'];
+            $parent->parent_email_2 =  $customerArr[$i]['email_2'];
+            $parent->save();
+
+            $student->parent_id = $parent->id;
+
+            $student->save();
+
+            $file = public_path('qrcode/'.$student->id.".png");
+            QRCode::url('qly.vietelite.edu.vn/student/'.$student->id)
+                      ->setSize(8)
+                      ->setMargin(2)->setOutfile($file) 
+                      ->png();
+            $student->qr_code = $file;
+            $student->save();
+
+        }
+
+        // return 'Jobi done or what ever';    
+    }
     public function count(){
         return Student::count();
     }
