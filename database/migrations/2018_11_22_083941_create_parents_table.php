@@ -16,9 +16,11 @@ class CreateParentsTable extends Migration
         Schema::create('parents', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 200);
+            $table->string('name_2' 200)->nullable()
             $table->string('phone_1', 12);
-            $table->string('phone_2', 12)->nullabl();
+            $table->string('phone_2', 40)->nullable();
             $table->string('parent_email', 200);
+            $table->string('parent_email_2', 200)->nullable();
             $table->string('work', 200)->nullable();
             $table->text('address')->nullable();
         });

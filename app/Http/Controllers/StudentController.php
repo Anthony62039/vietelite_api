@@ -118,6 +118,8 @@ class StudentController extends Controller
         $parent->phone_1 = $request->parentForm['parent_phone_1'];
         $parent->phone_2 = $request->parentForm['parent_phone_2'];
         $parent->parent_email = $request->parentForm['parent_email'];
+        $parent->name_2 = $request->parentForm['parent_name_2'];
+        $parent->parent_email_2 = $request->parentForm['parent_email_2'];
         $parent->save();
 
         $student->parent_id = $parent->id;
