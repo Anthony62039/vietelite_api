@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Student;
 use App\Parents;
 use App\Enroll;
@@ -10,11 +9,11 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
 use LaravelQRCode\Facades\QRCode;
+
 class EnrollController extends Controller
 {
     //
-    public function store(Request $request)
-    {
+    public function store(Request $request){
         //
         $student = new Student();
         $parent = new Parents();
@@ -42,15 +41,68 @@ class EnrollController extends Controller
         	# code...
         	$e = new Enroll();
         	$e->student_id = $student->id;
-        	$e->parent_id = $parent->id;
+         	$e->parent_id = $parent->id;
         	$e->subject = $enroll['subject'];
         	$e->class = $enroll['class'];
         	$e->note = $enroll['note'];
         	$e->appointment = date('Y-m-d', strtotime($enroll['appointment']['month']."/".$enroll['appointment']['day']."/".$enroll['appointment']['year']));
+            $e->receiver_id = $enroll['user_id'];
         	$e->save();
 
         }
 
 
     }
+    public function list(){
+         // Take Option ['all','test','getResult','result','firstday']
+        $option = Input::get('option');
+        // echo $option;
+        $filter = Input::get('filter');
+        $sortOrder= Input::get('sortOrder');
+        $pageNumber = Input::get('pageNumber');
+        $pageSize = Input::get('pageSize');
+
+        $result = [];
+        $enrolls = Enroll::select('enrolls.id as id','students.id as student_id','parents.id as parent_id','first_name','last_name','dob','name','phone_1','phone_2','parent_email','subject','enrolls.class as class','note','appointment','appointment_status','assign','assign_time','result','result_status','offical_class','first_day','first_day_status','active','receiver_id')->join('parents','parent_id','parents.id')->join('students','student_id','students.id');
+        if($sortOrder == 'desc'){
+            $enrolls->orderBy('student_id', 'DESC');
+        }
+        $filter = str_replace('%', '', $filter);
+        // $enrolls = $enrolls->whereRaw("concat(last_name,' ',first_name) like '%".$filter."%' OR concat(last_name,first_name) like '%".$filter."%'  ")->orWhere('students.id', 'like', '%'.$filter.'%')->orWhere('phone_1', 'like', '%'.$filter.'%')->orWhere('phone_2', 'like', '%'.$filter.'%');
+        switch ($option) {
+            case 'all':
+                # code...
+
+                break;
+            case 'test':
+                # code...
+                // echo "case test";
+                $result = $enrolls->where('appointment_status', 'Chưa báo')->orWhere('appointment_status','Đã báo')->get()->toArray();
+                break;
+            case 'getResult':
+                # code...
+                $result = $enrolls->where('appointment_status', 'Đã đến')->get()->toArray();
+                break;
+            case 'result':
+                # code...
+                
+                break;
+            case 'firstday':
+                # code...
+                
+                break;
+            
+            default:
+                # code...
+                break;
+        }
+        
+        
+        $initialPos = $pageNumber * $pageSize;
+        $result = array_slice($result, $initialPos, $initialPos + $pageSize);
+        return $result;
+
+    }
+    
+
 }

@@ -163,9 +163,9 @@ class StudentController extends Controller
                 $result =  $students->get()->toArray();
             }
             else{
-                //echo $filter;
+                //echo "concat(last_name,' ',first_name) like '%".$filter."%'";
                 $filter = str_replace('%', '', $filter);
-                $result = $students->whereRaw("concat(first_name,' ',last_name) like '%".$filter."%'")->orWhere('students.id', 'like', '%'.$filter.'%')->orWhere('phone_1', 'like', '%'.$filter.'%')->get()->toArray();
+                $result = $students->whereRaw("concat(last_name,' ',first_name) like '%".$filter."%' OR concat(last_name,first_name) like '%".$filter."%'  ")->orWhere('students.id', 'like', '%'.$filter.'%')->orWhere('phone_1', 'like', '%'.$filter.'%')->get()->toArray();
             }
             //echo $filter;
             
