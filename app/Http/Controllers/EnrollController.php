@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Student;
 use App\Parents;
 use App\Enroll;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
@@ -63,7 +64,7 @@ class EnrollController extends Controller
         $pageSize = Input::get('pageSize');
 
         $result = [];
-        $enrolls = Enroll::select('enrolls.id as id','students.id as student_id','parents.id as parent_id','first_name','last_name','dob','name','phone_1','phone_2','parent_email','subject','enrolls.class as class','note','appointment','appointment_status','assign','assign_time','result','result_status','offical_class','first_day','first_day_status','active','receiver_id')->join('parents','parent_id','parents.id')->join('students','student_id','students.id');
+        $enrolls = Enroll::select('enrolls.id as id','students.id as student_id','parents.id as parent_id',DB::raw('CONCAT(students.last_name," ",students.first_name) as student_name'),'dob','name','phone_1','phone_2','parent_email','subject','enrolls.class as class','note','appointment','appointment_status','assign','assign_time','result','result_status','offical_class','first_day','first_day_status','active','receiver_id')->join('parents','parent_id','parents.id')->join('students','student_id','students.id');
         if($sortOrder == 'desc'){
             $enrolls->orderBy('student_id', 'DESC');
         }
@@ -81,9 +82,10 @@ class EnrollController extends Controller
                 break;
             case 'getResult':
                 # code...
-                $result = $enrolls->where('appointment_status', 'Đã đến')->get()->toArray();
+                $result = $enrolls->where('appointment_status', 'Đã đến')->where('result', NULL)->get()->toArray();
                 break;
             case 'result':
+                $result = $enrolls->where('result','!=',NULL)->where('')
                 # code...
                 
                 break;
@@ -100,8 +102,24 @@ class EnrollController extends Controller
         
         $initialPos = $pageNumber * $pageSize;
         $result = array_slice($result, $initialPos, $initialPos + $pageSize);
-        return $result;
+        // echo"<pre>";
+        // print_r($this->filter($result, $filter));      
+        
+        return $this->filter($result, $filter);
 
+    }
+    public function filter($array, $needle){
+        $result = [];
+        if($needle == ""){
+            return $array;
+        }
+        foreach ($array as $key => $value) {
+            # code...
+            $v = json_encode($value, JSON_UNESCAPED_UNICODE);
+            if
+
+        }
+        return $result;
     }
     
 
