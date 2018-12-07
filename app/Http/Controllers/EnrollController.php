@@ -82,20 +82,23 @@ class EnrollController extends Controller
                 break;
             case 'getResult':
                 # code...
+                echo "getReulst";
                 $result = $enrolls->where('appointment_status', 'Đã đến')->where('result', NULL)->get()->toArray();
                 break;
             case 'result':
-                $result = $enrolls->where('result','!=',NULL)->where('')
-                # code...
+                echo "result ";
+                $result = $enrolls->where('result','!=',NULL)->where('offical_class', NULL)->get()->toArray();
+                # code...   
                 
                 break;
             case 'firstday':
                 # code...
-                
+                 $result = $enrolls->where('offical_class', '!=', NULL)->get()->toArray();
                 break;
             
             default:
                 # code...
+                $result = $enrolls->get()->toArray();
                 break;
         }
         
@@ -105,7 +108,7 @@ class EnrollController extends Controller
         // echo"<pre>";
         // print_r($this->filter($result, $filter));      
         
-        return $this->filter($result, $filter);
+        return json_encode($this->filter($result, $filter), JSON_UNESCAPED_UNICODE);
 
     }
     public function filter($array, $needle){
@@ -116,7 +119,9 @@ class EnrollController extends Controller
         foreach ($array as $key => $value) {
             # code...
             $v = json_encode($value, JSON_UNESCAPED_UNICODE);
-            if
+            if(strpos($v, $needle) !== false){
+                array_push($result, $value);
+            }
 
         }
         return $result;
