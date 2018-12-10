@@ -150,7 +150,7 @@ class StudentController extends Controller
         $pageNumber = Input::get('pageNumber');
         $pageSize = Input::get('pageSize');
 
-        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','work','address')->join('parents','parent_id','parents.id');
+        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','parent_email_2','work','address')->join('parents','parent_id','parents.id');
         //Index
         //echo $studentId;
         if($sortOrder == 'desc'){
@@ -185,12 +185,23 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function update($id, Request $request)
     {
         //
         if ($id != null) {
-            Student::where('id', $id)->update($request->all());  
+            $student = Student::find($id);
+            $student->first_name = $request->first_name;
+            $student->last_name = $request->last_name;
+            $student->gender = $request->gender;
+            $student->dob = date('Y-m-d', strtotime("+1 day", strtotime($request->dob)));
+            $student->class = $request->class;
+            $student->phone = $request->phone;
+            $student->school = $request->school;
+            $student->save();
+            Parents::where('id', $student->parent_id)->update($request->parentForm);
         }
+        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','parent_email_2','work','address')->join('parents','parent_id','parents.id')->where('students.id', $id)->get()->toArray();
+        return $students;
     }
 
     /**
@@ -200,13 +211,7 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
-        //
-        if ($id != null) {
-            Student::where('id', $id)->update($request->all());  
-        }
-    }
+    
 
     /**
      * Remove the specified resource from storage.
