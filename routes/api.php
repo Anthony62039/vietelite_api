@@ -25,5 +25,8 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh');
     Route::post('me', 'AuthController@me');
     Route::post('signup', 'AuthController@signup');
+    Route::get('test', function(){
+        return response()->json(['foo'=>'bar']);
+    });
 
 });

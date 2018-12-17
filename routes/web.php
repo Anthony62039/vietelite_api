@@ -15,24 +15,31 @@ Route::get('/', function () {
     return view('welcome');
 });
 use Illuminate\Http\Request;
+Route::group([
 
-// Get list of students
-Route::get('students','StudentController@index');
+    'middleware' => 'jwt.auth',
 
-// Get specific student
-Route::get('student','StudentController@show');
+], function ($router) {
+	//Student
+    Route::get('students','StudentController@index');
+    Route::get('student','StudentController@show');
+	Route::delete('student/{id}','StudentController@destroy');
+	Route::put('student/{id}','StudentController@update');
+	Route::post('student','StudentController@store');
+	Route::get('student/count', 'StudentController@count');
+	Route::get('import', 'StudentController@import');
+	//Enroll
+	Route::post('enroll', 'EnrollController@store');
+	Route::get('enroll/list', 'EnrollController@list');
 
-// Delete a student
-Route::delete('student/{id}','StudentController@destroy');
+	//Classes
+	Route::get('classes', 'ClassController@index');
+	Route::post('class','ClassController@store');
+	Route::put('class/{id}', 'ClassController@edit');
+	Route::delete('class/{id}','ClassController@destroy');
 
-// Update existing student
-Route::put('student/{id}','StudentController@update');
+});// Get list of students
 
-// Create new student
-Route::post('student','StudentController@store');
-
-Route::get('student/count', 'StudentController@count');
-Route::post('enroll', 'EnrollController@store');
-Route::get('import', 'StudentController@import');
-
-Route::get('enroll/list', 'EnrollController@list');
+Route::middleware('jwt.auth')->get('users', function(Request $request) {
+    return auth()->user();
+});
