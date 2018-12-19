@@ -21,7 +21,10 @@ Route::group([
 
 ], function ($router) {
 	//Student
-    Route::get('students','StudentController@index');
+    
+
+});// Get list of students
+Route::get('students','StudentController@index');
     Route::get('student','StudentController@show');
 	Route::delete('student/{id}','StudentController@destroy');
 	Route::put('student/{id}','StudentController@update');
@@ -33,13 +36,10 @@ Route::group([
 	Route::get('enroll/list', 'EnrollController@list');
 
 	//Classes
-	Route::get('classes', 'ClassController@index');
+	Route::get('class', 'ClassController@show');
 	Route::post('class','ClassController@store');
 	Route::put('class/{id}', 'ClassController@edit');
 	Route::delete('class/{id}','ClassController@destroy');
-
-});// Get list of students
-
 Route::middleware('jwt.auth')->get('users', function(Request $request) {
     return auth()->user();
 });

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Input;
 use App\Classes;
@@ -40,42 +39,42 @@ class ClassController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    public function filter($array, $needle){
+        $result = [];
+        if($needle == ""){
+            return $array;
+        }
+        foreach ($array as $key => $value) {
+            # code...
+            $v = json_encode($value, JSON_UNESCAPED_UNICODE);
+            if(strpos($v, $needle) !== false){
+                array_push($result, $value);
+            }
+
+        }
+        return $result;
+    }
     public function show()
     {
         // Take Params
-        $studentId = Input::get('studentId');
         $filter = Input::get('filter');
         $sortOrder= Input::get('sortOrder');
         $pageNumber = Input::get('pageNumber');
         $pageSize = Input::get('pageSize');
 
-        $students = Student::select('students.id as student_id','parents.id as parent_id','parent_id','first_name','last_name','dob','gender','school','class','email','phone','avatar','qr_code','name','phone_1','phone_2','parent_email','parent_email_2','work','address')->join('parents','parent_id','parents.id');
+        
         //Index
         //echo $studentId;
         if($sortOrder == 'desc'){
-            $students->orderBy('student_id', 'DESC');
+            $result = Classes::orderBy('id', 'DESC')->get()->toArray();
         }
-        $result = [];
-
-        if($studentId == '-1'){
-            if($filter == ''){
-                $result =  $students->get()->toArray();
-            }
-            else{
-                //echo "concat(last_name,' ',first_name) like '%".$filter."%'";
-                $filter = str_replace('%', '', $filter);
-                $result = $students->whereRaw("concat(last_name,' ',first_name) like '%".$filter."%' OR concat(last_name,first_name) like '%".$filter."%'  ")->orWhere('students.id', 'like', '%'.$filter.'%')->orWhere('phone_1', 'like', '%'.$filter.'%')->get()->toArray();
-            }
-            //echo $filter;
-            
-        }
-        else{            
-            $result = Student::join('parents','parent_id','parents.id')->where('students.id',$studentId)->get()->toArray();
-        }
-        
+        else{
+            $result = Classes::orderBy('id', 'DESC')->get()->toArray();
+        }       
         $initialPos = $pageNumber * $pageSize;
         $result = array_slice($result, $initialPos, $initialPos + $pageSize);
-        return $result;
+        // print_r($result);   
+        return json_encode($this->filter($result, $filter), JSON_UNESCAPED_UNICODE);
     }
 
     /**
